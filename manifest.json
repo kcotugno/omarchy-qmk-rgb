@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "kcotugno.qmk-rgb",
+  "name": "QMK RGB",
+  "version": "1.0.0",
+  "author": "Kevin Cotugno",
+  "license": "MIT",
+  "description": "Control the RGB lighting of VIA-enabled QMK keyboards from the Omarchy bar.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "QMK RGB",
+    "description": "Brightness, effect, speed, and color for QMK keyboards over VIA.",
+    "category": "System",
+    "aliases": [
+      "keyboard",
+      "rgb",
+      "lighting",
+      "via"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "autoSave": true,
+      "applyToAll": false,
+      "step": 16,
+      "effectNames": ""
+    },
+    "schema": [
+      {
+        "key": "autoSave",
+        "type": "boolean",
+        "label": "Save changes to the keyboard's EEPROM automatically",
+        "defaultValue": true
+      },
+      {
+        "key": "applyToAll",
+        "type": "boolean",
+        "label": "Apply changes to every connected keyboard",
+        "defaultValue": false
+      },
+      {
+        "key": "step",
+        "type": "integer",
+        "label": "Scroll and arrow-key step (0-255 scale)",
+        "min": 1,
+        "max": 64,
+        "step": 1,
+        "defaultValue": 16
+      },
+      {
+        "key": "effectNames",
+        "type": "string",
+        "label": "Override effect names, comma separated from effect 1 (blank uses effects/ mappings)",
+        "defaultValue": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Keebio Iris Rev. 8",
+  "vendorId": "0xCB10",
+  "productId": "0x8256",
+  "lighting": "rgb_matrix",
+  "source": "https://github.com/the-via/keyboards/blob/master/v3/keebio/iris/iris-rev8.json",
+  "preset": "via-qmk-rgb-matrix"
+}
