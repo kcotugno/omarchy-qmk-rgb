@@ -3,7 +3,8 @@
 An [Omarchy](https://omarchy.org) shell plugin that controls the RGB lighting
 of QMK keyboards from the bar. Click the keyboard icon for a panel with
 brightness, effect, speed, and color. **Match theme** sets the keyboard to
-your Omarchy theme's accent color. Use the scroll wheel on the icon to
+your Omarchy theme's color, and `followTheme` does it automatically whenever
+you switch themes. Use the scroll wheel on the icon to
 change brightness, and right-click it to turn the lighting on or off.
 
 It talks to the keyboard over the [VIA](https://www.caniusevia.com/) raw HID
@@ -54,13 +55,14 @@ The rule grants access only to the keyboards' vendor/product ids, using
 Edit the widget's entry in `~/.config/omarchy/shell.json`:
 
 ```json
-{ "id": "kcotugno.qmk-rgb", "autoSave": true, "applyToAll": false, "step": 16, "effectNames": "" }
+{ "id": "kcotugno.qmk-rgb", "autoSave": true, "applyToAll": false, "followTheme": false, "step": 16, "effectNames": "" }
 ```
 
 | Key           | Default | Meaning |
 |---------------|---------|---------|
 | `autoSave`    | `true`  | Writes changes to the keyboard's EEPROM 1.5s after you stop adjusting. When it's off, the panel shows a **Save to keyboard** button, and unsaved changes are lost when the keyboard is unplugged. |
 | `applyToAll`  | `false` | Sends every change to all connected VIA keyboards instead of only the selected one. |
+| `followTheme` | `false` | Sets the keyboard color to the new theme's color whenever you switch themes. See [Match theme](#match-theme). |
 | `step`        | `16`    | How much one scroll notch or arrow key changes a value, on the 0-255 scale. |
 | `effectNames` | `""`    | Comma-separated effect names, starting with effect 1. Overrides the keyboard's [mapping file](#effect-names). Leave blank to use the mapping file. |
 
@@ -143,14 +145,30 @@ effect 1 jumps to the last effect.
 
 ## Match theme
 
-**Match theme** converts the theme's accent color to the keyboard's hue and
-saturation. If the current effect ignores hue (Digital Rain, the Cycle effects,
+**Match theme** converts the theme's keyboard color to the keyboard's hue and
+saturation. That's the theme's `keyboard.rgb`, which Omarchy generates from the
+accent color unless the theme ships its own. If the current effect ignores hue (Digital Rain, the Cycle effects,
 or lighting that's off), it also switches to effect 1 (Solid Color), so the
 change shows up. The button is highlighted while the keyboard matches the
-accent. The keyboard's brightness stays as it is.
+theme color. The keyboard's brightness stays as it is.
 
 LEDs don't reproduce colors exactly, so expect a close match rather than an
-identical one. Very desaturated accents come out close to white.
+identical one. Very desaturated colors come out close to white.
+
+### Following the theme
+
+With `followTheme` on, the panel watches for theme switches and applies the
+new theme's color to the selected keyboard, or to every keyboard with
+`applyToAll`. Unlike the button, it only changes the color: it keeps the
+current effect, and it doesn't turn the lighting on. If the effect ignores hue,
+the new color shows up once you switch to one that uses it. With `autoSave` on,
+the color is saved to the keyboard, so it's still there after you unplug it.
+Theme switches are rare, so saving on each one doesn't wear out the keyboard's
+memory.
+
+The shell has to be running when you switch themes. If you set up an Omarchy
+`theme-set` hook to color the keyboard, remove it when you turn this on, so the
+two don't write to the keyboard at the same time.
 
 ## Keyboard navigation
 
@@ -176,7 +194,7 @@ The running panel also exposes IPC methods:
 
 ```bash
 omarchy-shell kcotugno.qmk-rgb toggleLighting
-omarchy-shell kcotugno.qmk-rgb matchTheme      # color = theme accent
+omarchy-shell kcotugno.qmk-rgb matchTheme      # color = theme keyboard color
 omarchy-shell kcotugno.qmk-rgb nextEffect      # also: previousEffect, refresh, toggle
 ```
 
@@ -230,8 +248,9 @@ omarchy plugin enable kcotugno.qmk-rgb
 ```
 
 The plugin folder itself may be a symlink, but it may not contain symlinks.
-The shell doesn't follow the link when watching for changes, so after editing
-run `omarchy-shell shell rescanPlugins` to reload.
+The shell doesn't follow the link when watching for changes, and
+`rescanPlugins` keeps the version of `Panel.qml` it already loaded, so after
+editing run `omarchy restart shell` to reload.
 
 ## License
 

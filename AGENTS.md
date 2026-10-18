@@ -52,9 +52,10 @@ omarchy plugin validate .
 
 When you change `Panel.qml`, also load it in the shell. The checkout may be
 symlinked as `~/.config/omarchy/plugins/kcotugno.qmk-rgb`. File watching does
-not follow that link, so run `omarchy-shell shell rescanPlugins` after
-editing. Then check the shell log for QML errors
-(`journalctl --user -t omarchy-shell`).
+not follow that link, and `omarchy-shell shell rescanPlugins` keeps the
+already-loaded `Panel.qml`, so run `omarchy restart shell` after editing. Then
+check the shell log for QML errors
+(`quickshell log -p "$OMARCHY_PATH/shell" | grep qmk-rgb`).
 
 When testing against real hardware, don't use `--save` unless you mean to.
 Unsaved changes revert when the keyboard is unplugged.

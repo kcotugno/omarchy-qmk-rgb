@@ -27,6 +27,7 @@
     "defaults": {
       "autoSave": true,
       "applyToAll": false,
+      "followTheme": false,
       "step": 16,
       "effectNames": ""
     },
@@ -41,6 +42,12 @@
         "key": "applyToAll",
         "type": "boolean",
         "label": "Apply changes to every connected keyboard",
+        "defaultValue": false
+      },
+      {
+        "key": "followTheme",
+        "type": "boolean",
+        "label": "Change the keyboard color when the Omarchy theme changes",
         "defaultValue": false
       },
       {

@@ -23,6 +23,7 @@ Panel {
 
   readonly property bool autoSave: setting("autoSave", true) !== false
   readonly property bool applyToAll: setting("applyToAll", false) === true
+  readonly property bool followTheme: setting("followTheme", false) === true
   readonly property int step: Math.max(1, Number(setting("step", 16)) || 16)
   readonly property var effectNames: {
     var raw = String(setting("effectNames", "") || "")
@@ -36,6 +37,14 @@ Panel {
   property bool loaded: false
   property var pendingChange: null
   property string pendingTarget: ""
+  property bool themeSwitched: false
+  property bool followAfterRefresh: false
+
+  // Omarchy gives keyboards their own theme color in keyboard.rgb. It's the
+  // accent unless the theme ships its own file.
+  readonly property string themeState: Quickshell.env("HOME") + "/.local/state/omarchy/current"
+  property string keyboardRgb: ""
+  readonly property color themeColor: /^#[0-9a-fA-F]{6}$/.test(keyboardRgb) ? keyboardRgb : Commons.Color.accent
 
   // Keyboard cursor: rows of the panel walked with up/down, adjusted with
   // left/right.
@@ -162,13 +171,32 @@ Panel {
     }
   }
 
-  // Set the lighting to the theme's accent. An effect that ignores hue would
-  // hide the change, so fall back to Solid Color (effect 1) for those.
+  // Set the lighting to the theme's keyboard color. An effect that ignores
+  // hue would hide the change, so fall back to Solid Color (effect 1) for those.
   function matchTheme() {
     if (!hasColor) return
-    var change = hueSaturation(Commons.Color.accent)
+    var change = hueSaturation(themeColor)
     if (!uses("hue")) change.effect = 1
     apply(change)
+  }
+
+  // A theme switch only recolors. The effect and on/off state stay as they
+  // are, so an effect that ignores hue shows the color once you leave it.
+  // The keyboard list may be stale (replugged since the last refresh), so
+  // refresh once before giving up.
+  function followThemeColor(retried) {
+    if (ready) {
+      if (hasColor) apply(hueSaturation(themeColor))
+    } else if (!retried) {
+      followAfterRefresh = true
+      refresh()
+    }
+  }
+
+  function themeColorLoaded() {
+    if (!themeSwitched) return
+    themeSwitched = false
+    if (followTheme) followThemeColor(false)
   }
 
   function save() {
@@ -252,7 +280,44 @@ Panel {
   Process {
     id: statusProc
     command: root.backend.concat(["status"])
-    stdout: StdioCollector { waitForEnd: true; onStreamFinished: root.ingest(text, true) }
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        root.ingest(text, true)
+        if (root.followAfterRefresh) {
+          root.followAfterRefresh = false
+          root.followThemeColor(true)
+        }
+      }
+    }
+  }
+
+  // omarchy-theme-set rewrites theme.generation once the new theme is in
+  // place. The theme directory itself is replaced, so it can't be watched.
+  FileView {
+    id: generationFile
+    path: root.themeState + "/theme.generation"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: {
+      root.themeSwitched = true
+      keyboardRgbFile.reload()
+    }
+  }
+
+  FileView {
+    id: keyboardRgbFile
+    path: root.themeState + "/theme/keyboard.rgb"
+    watchChanges: false
+    printErrors: false
+    onLoaded: {
+      root.keyboardRgb = String(text() || "").trim()
+      root.themeColorLoaded()
+    }
+    onLoadFailed: {
+      root.keyboardRgb = ""
+      root.themeColorLoaded()
+    }
   }
 
   Process {
@@ -630,12 +695,12 @@ Panel {
 
           Button {
             id: themeButton
-            readonly property var theme: root.hueSaturation(Commons.Color.accent)
+            readonly property var theme: root.hueSaturation(root.themeColor)
             visible: root.hasColor
             width: parent.width
             text: "Match theme"
             iconText: "󰏘"
-            tooltipText: "Set the keyboard color to the theme's accent"
+            tooltipText: "Set the keyboard to the theme's keyboard color"
             active: root.showHue && root.device.hue === theme.hue && root.device.saturation === theme.saturation
             foreground: root.foreground
             fontFamily: root.fontFamily
