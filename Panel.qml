@@ -23,7 +23,7 @@ Panel {
 
   readonly property bool autoSave: setting("autoSave", true) !== false
   readonly property bool applyToAll: setting("applyToAll", false) === true
-  readonly property bool followTheme: setting("followTheme", false) === true
+  readonly property bool followTheme: setting("followTheme", true) !== false
   readonly property int step: Math.max(1, Number(setting("step", 16)) || 16)
   readonly property var effectNames: {
     var raw = String(setting("effectNames", "") || "")
@@ -295,11 +295,12 @@ Panel {
     }
   }
 
-  // omarchy-theme-set rewrites theme.generation once the new theme is in
-  // place. The theme directory itself is replaced, so it can't be watched.
+  // omarchy-theme-set rewrites theme.name once the new theme is in place
+  // (theme.generation is newer and missing before Omarchy 4.5). The theme
+  // directory itself is replaced, so it can't be watched.
   FileView {
-    id: generationFile
-    path: root.themeState + "/theme.generation"
+    id: themeNameFile
+    path: root.themeState + "/theme.name"
     watchChanges: true
     printErrors: false
     onFileChanged: {

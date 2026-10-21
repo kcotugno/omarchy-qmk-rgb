@@ -27,7 +27,7 @@
     "defaults": {
       "autoSave": true,
       "applyToAll": false,
-      "followTheme": false,
+      "followTheme": true,
       "step": 16,
       "effectNames": ""
     },
@@ -48,7 +48,7 @@
         "key": "followTheme",
         "type": "boolean",
         "label": "Change the keyboard color when the Omarchy theme changes",
-        "defaultValue": false
+        "defaultValue": true
       },
       {
         "key": "step",

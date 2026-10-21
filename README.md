@@ -57,14 +57,20 @@ Edit the widget's entry in `~/.config/omarchy/shell.json`:
 |---------------|---------|---------|
 | `autoSave`    | `true`  | Save changes to the keyboard's EEPROM 1.5s after you stop adjusting. When it's off, the panel shows a **Save to keyboard** button, and unsaved changes are lost when the keyboard is unplugged. |
 | `applyToAll`  | `false` | Send every change to all connected VIA keyboards. |
-| `followTheme` | `false` | Set the keyboard color to the theme's color when you switch themes. |
+| `followTheme` | `true`  | Set the keyboard color to the theme's color when you switch themes. |
 | `step`        | `16`    | How much one scroll notch or arrow key changes a value (0-255 scale). |
 | `effectNames` | `""`    | Comma-separated effect names, starting with effect 1. Overrides the [mapping file](#effect-names). |
 
 **Match theme** sets the keyboard to the theme's `keyboard.rgb` color. If the
 current effect ignores hue, it also switches to Solid Color. `followTheme` only
 changes the color and keeps the effect. If you have a `theme-set` hook that
-colors the keyboard, remove it before you turn `followTheme` on.
+colors the keyboard, remove it or turn `followTheme` off.
+
+To keep your own color across theme switches, turn `followTheme` off:
+
+```json
+{ "id": "kcotugno.qmk-rgb", "followTheme": false }
+```
 
 ## Effect names
 
