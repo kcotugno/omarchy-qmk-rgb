@@ -262,19 +262,22 @@ Panel {
 
   Component.onCompleted: refresh()
 
-  ShellIpc {
+  // A plain IpcHandler rather than Omarchy 4.5's ShellIpc, so the widget
+  // loads on 4.0 too. omarchy-shell falls back to qs ipc, which needs the
+  // return types.
+  IpcHandler {
     target: "kcotugno.qmk-rgb"
 
-    function open() { root.open() }
-    function close() { root.close() }
-    function show() { root.open() }
-    function hide() { root.close() }
-    function toggle() { root.toggle() }
-    function refresh() { root.refresh() }
-    function toggleLighting() { root.toggleLighting() }
-    function nextEffect() { root.stepEffect(1) }
-    function matchTheme() { root.matchTheme() }
-    function previousEffect() { root.stepEffect(-1) }
+    function open(): void { root.open() }
+    function close(): void { root.close() }
+    function show(): void { root.open() }
+    function hide(): void { root.close() }
+    function toggle(): void { root.toggle() }
+    function refresh(): void { root.refresh() }
+    function toggleLighting(): void { root.toggleLighting() }
+    function nextEffect(): void { root.stepEffect(1) }
+    function matchTheme(): void { root.matchTheme() }
+    function previousEffect(): void { root.stepEffect(-1) }
   }
 
   Process {
@@ -416,7 +419,7 @@ Panel {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
 
-            Behavior on color { ColorAnimation { duration: Style.duration(200) } }
+            Behavior on color { ColorAnimation { duration: typeof Style.duration === "function" ? Style.duration(200) : 200 } }
           }
 
           Column {

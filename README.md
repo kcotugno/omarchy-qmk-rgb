@@ -13,6 +13,7 @@ Esc closes it.
 
 ## Requirements
 
+- Omarchy 4.0.6 or later.
 - A QMK keyboard built with VIA enabled (`VIA_ENABLE = yes`). Most "VIA
   compatible" keyboards ship this way.
 - RGB Matrix, RGB Light, or LED Matrix in the firmware. LED Matrix is
