@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kcotugno.qmk-rgb",
   "name": "QMK RGB",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Kevin Cotugno",
   "license": "MIT",
   "description": "Control the RGB lighting of VIA-enabled QMK keyboards from the Omarchy bar.",
